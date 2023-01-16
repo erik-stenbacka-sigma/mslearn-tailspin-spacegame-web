@@ -11,6 +11,14 @@ variables:
   releaseBranchName: 'release'
   system.debug: true
 
+schedules:
+  - cron: '0 3 * * *'
+    displayName: 'Deploy every day at 3 A.M.'
+    branches:
+      include:
+      - release
+    always: false
+
 stages:
   - stage: 'Build'
     displayName: 'Build the web application'
@@ -100,7 +108,7 @@ stages:
                 displayName: "Azure App Service Deploy: website"
                 inputs:
                   azureSubscription: Resource Manager - Tailspin - Space Game
-                  appName: $(WebAppName)
+                  appName: ${{ variables['WebAppName'] }}
                   appType: webAppLinux
                   package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
 
