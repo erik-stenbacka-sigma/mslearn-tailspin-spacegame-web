@@ -108,7 +108,31 @@ stages:
                 displayName: "Azure App Service Deploy: website"
                 inputs:
                   azureSubscription: Resource Manager - Tailspin - Space Game
-                  appName: ${{ variables['WebAppName'] }}
+                  appName: tailspin-space-game-1337 # https://github.com/microsoft/azure-pipelines-tasks/issues/13350
                   appType: webAppLinux
                   package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
 
+  - stage: Test
+    displayName: Deploy to the test environment
+    dependsOn: Dev
+    # condition: eq(variables['Build.Reason'], 'Schedule')
+    jobs:
+      - deployment: Deploy
+        pool:
+          vmImage: ubuntu-22.04
+        environment: test
+        variables:
+        - group: Release
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+              - download: current
+                artifact: drop
+              - task: AzureWebApp@1
+                displayName: Azure App service deploy
+                inputs:
+                  azureSubscription: Resource Manager - Tailspin - Space Game
+                  appType: webAppLinux
+                  appName: tailspin-space-game-web-test-1337
+                  package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
