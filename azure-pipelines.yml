@@ -136,3 +136,27 @@ stages:
                   appType: webAppLinux
                   appName: tailspin-space-game-web-test-1337
                   package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+
+  - stage: Staging
+    displayName: Deploy to the staging environment
+    dependsOn: Test
+    jobs:
+      - deployment: Deploy
+        pool:
+          vmImage: ubuntu-22.04
+        environment: staging
+        variables:
+        - group: Release
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: drop
+                - task: AzureWebApp@1
+                  displayName: Deploy webiste
+                  inputs:
+                    azureSubscription: Resource Manager - Tailspin - Space Game
+                    appType: webAppLinux
+                    appName: tailspin-space-game-web-staging-1337
+                    package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
