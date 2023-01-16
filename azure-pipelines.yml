@@ -70,8 +70,9 @@ stages:
             arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
             zipAfterPublish: true
 
-        - publish: '$(Build.ArtifactStagingDirectory)'
-          artifact: drop
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifact: drop'
+          condition: succeeded()
 
   - stage: Deploy
     displayName: Deploy the web application
